@@ -25,13 +25,13 @@ export default function App() {
 
   // leva：画面右上のツマミで触れるパラメータ
   const ctrl = useControls({
-    wordCount: { value: 1400, min: 200, max: 4000, step: 100 },
+    wordCount: { value: 600, min: 80, max: 2500, step: 20 },
     riseSpeed: { value: 0.08, min: 0.01, max: 0.3, step: 0.01 },
     spiral: { value: 1.0, min: 0, max: 3, step: 0.1 },
     sediment: { value: 0.6, min: 0, max: 1, step: 0.01 },
     globalSpin: { value: 0.04, min: 0, max: 0.3, step: 0.01 },
     mirrorWarp: { value: 0.5, min: 0, max: 2, step: 0.05 },
-    bloom: { value: 0.9, min: 0, max: 2.5, step: 0.05 },
+    bloom: { value: 0.55, min: 0, max: 2.5, step: 0.05 },
     colorBottom: '#dff0ff', // 下＝冷たい白
     colorTop: '#5b8cff', // 上＝青
   })
@@ -69,7 +69,7 @@ export default function App() {
         <EffectComposer>
           <Bloom
             intensity={ctrl.bloom}
-            luminanceThreshold={0.25}
+            luminanceThreshold={0.5}
             luminanceSmoothing={0.9}
             mipmapBlur
           />

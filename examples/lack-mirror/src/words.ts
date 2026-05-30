@@ -36,9 +36,9 @@ export function buildWordAtlas(): THREE.CanvasTexture {
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
 
-  // 日本語フォントの候補（Mac→Win の順）。環境にある最初のものが使われる。
+  // 日本語フォントの候補（Mac→Win→Linux の順）。環境にある最初のものが使われる。
   const fontFamily =
-    '"Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif'
+    '"Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "Noto Sans JP", "Noto Sans CJK JP", sans-serif'
 
   WORDS.forEach((word, i) => {
     const col = i % GRID_COLS
@@ -54,10 +54,14 @@ export function buildWordAtlas(): THREE.CanvasTexture {
       ctx.font = `700 ${fontSize}px ${fontFamily}`
     }
 
-    // ほのかな発光（影）でにじませてから白文字を描く
-    ctx.shadowColor = 'rgba(180,220,255,0.9)'
-    ctx.shadowBlur = 22
+    // 文字はくっきり描く（にじみは後段のBloomで足す）。
+    // 少しだけ影を入れて輪郭を締める程度に留める。
+    ctx.shadowColor = 'rgba(150,200,255,0.6)'
+    ctx.shadowBlur = 6
     ctx.fillStyle = '#ffffff'
+    ctx.fillText(word, cx, cy)
+    // 二度描きして芯を濃くし、小さくても読めるようにする
+    ctx.shadowBlur = 0
     ctx.fillText(word, cx, cy)
   })
 

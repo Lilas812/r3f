@@ -6,7 +6,7 @@ import { GRID_COLS, GRID_ROWS, WORDS } from '../words'
 
 // ── 文字粒のシェーダーマテリアル ────────────────────────────────
 // 位置・螺旋・上昇・フェード・ビルボードを全て頂点シェーダーで計算する。
-// CPUで毎フレーム配列を更新しないので、数千個でも軽い。
+// CPUで毎フレーム配列を更新しないので、数百〜数千個でも軽い。
 const WordParticlesMaterial = shaderMaterial(
   {
     uTime: 0,
@@ -90,8 +90,8 @@ const WordParticlesMaterial = shaderMaterial(
       vec3 col = mix(uColorBottom, uColorTop, vLife);
 
       // 奥行きフェード：遠い粒を淡くして霧のような立体感を出す
-      float haze = smoothstep(11.0, 4.0, vViewZ);
-      float a = tex.a * vAlpha * uOpacity * mix(0.3, 1.0, haze);
+      float haze = smoothstep(12.0, 4.0, vViewZ);
+      float a = tex.a * vAlpha * uOpacity * mix(0.25, 1.0, haze);
 
       // 加算合成（AdditiveBlending）前提：alphaに明るさを載せる
       gl_FragColor = vec4(col, a);
@@ -132,7 +132,8 @@ export default function WordParticles({
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2
       const angSpeed = (0.4 + Math.random() * 0.6) * (Math.random() < 0.5 ? -1 : 1)
-      const radius = 1.6 + Math.random() * 2.6 // 鏡の外側〜やや遠く
+      // 鏡の外側〜遠くまで広く散らす（中心を埋めすぎず、鏡が見えるように）
+      const radius = 1.8 + Math.random() * 3.0
       const lifeOffset = Math.random()
       aMotion[i * 4 + 0] = angle
       aMotion[i * 4 + 1] = angSpeed
@@ -143,7 +144,8 @@ export default function WordParticles({
       aCell[i * 2 + 0] = w % GRID_COLS
       aCell[i * 2 + 1] = Math.floor(w / GRID_COLS)
 
-      aScale[i] = 0.16 + Math.random() * 0.18
+      // 大小に差をつける：多くは小さな粒、一部は大きく「読める」言葉に
+      aScale[i] = 0.18 + Math.pow(Math.random(), 1.8) * 0.45
       aStartY[i] = 0.05 + Math.random() * 0.5
     }
     return { aMotion, aCell, aScale, aStartY }

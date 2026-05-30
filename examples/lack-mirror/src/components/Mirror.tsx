@@ -34,14 +34,18 @@ const fragmentShader = /* glsl */ `
 
     // 中心のほのかな暖色光（ゆっくり脈打つ）
     float centerGlow = smoothstep(0.95, 0.0, r);
-    base += vec3(0.20, 0.12, 0.06) * centerGlow * (0.5 + 0.2 * sin(uTime * 0.5));
+    base += vec3(0.22, 0.13, 0.07) * centerGlow * (0.6 + 0.25 * sin(uTime * 0.5));
 
     // うっすら人影（頭＋肩）。背景よりほんの少し明るい青白
     vec2 q = wuv - vec2(0.5, 0.52);
     float head = smoothstep(0.16, 0.10, length(q - vec2(0.0, 0.14)));
     float shoulders = smoothstep(0.42, 0.18, length(q * vec2(1.0, 2.2) - vec2(0.0, -0.18)));
     float body = clamp(head + shoulders, 0.0, 1.0);
-    base = mix(base, base + vec3(0.05, 0.07, 0.10), body * 0.5);
+    base = mix(base, base + vec3(0.06, 0.08, 0.12), body * 0.7);
+
+    // 鏡の縁にうっすらリングを入れて「鏡」だと分かるように
+    float ring = smoothstep(0.04, 0.0, abs(r - 0.9)) * 0.3;
+    base += vec3(0.10, 0.13, 0.18) * ring;
 
     // 円の縁をやわらかくフェード（くっきりした輪郭を出さない）
     float alpha = smoothstep(1.0, 0.78, r);

@@ -7,13 +7,19 @@ import { buildWordAtlas } from './words'
 import WordParticles from './components/WordParticles'
 import Sediment from './components/Sediment'
 import Mirror from './components/Mirror'
+import { getCycleState } from './cycle'
 
-// マウスでカメラをゆっくり追従させる（弱め）。常に鏡を見る。
-function Rig() {
+// マウスでカメラをゆっくり追従させる（弱め）＋クライマックスで静かに寄る。
+// 棒人間が完成する瞬間に少しだけカメラが前へ詰める＝緩急の演出。
+function Rig({ formFigure, cycleSeconds }: { formFigure: boolean; cycleSeconds: number }) {
   useFrame((state) => {
     const p = state.pointer
+    // 集合度に応じて寄り（z=6.2→5.4）。easeで滑らかに
+    const g = formFigure ? getCycleState(state.clock.elapsedTime, cycleSeconds).gather : 0
+    const targetZ = 6.2 - g * 0.8
     state.camera.position.x += (p.x * 0.6 - state.camera.position.x) * 0.03
     state.camera.position.y += (1.7 + p.y * 0.3 - state.camera.position.y) * 0.03
+    state.camera.position.z += (targetZ - state.camera.position.z) * 0.04
     state.camera.lookAt(0, 1.7, 0)
   })
   return null
@@ -34,6 +40,9 @@ export default function App() {
     bloom: { value: 0.55, min: 0, max: 2.5, step: 0.05 },
     colorBottom: '#dff0ff', // 下＝冷たい白
     colorTop: '#5b8cff', // 上＝青
+    // ▼ 緩急のある「棒人間が組み上がる」演出
+    formFigure: true, // ON=漂い→集合→棒人間→拡散のループ / OFF=ただ漂うだけ
+    cycleSeconds: { value: 12, min: 6, max: 24, step: 1 }, // 1サイクルの長さ（秒）
   })
 
   return (
@@ -46,12 +55,12 @@ export default function App() {
           scene.background = new THREE.Color('#06070b')
         }}
       >
-        <Rig />
+        <Rig formFigure={ctrl.formFigure} cycleSeconds={ctrl.cycleSeconds} />
 
         {/* 中央の歪んだ鏡（うっすら人影） */}
         <Mirror warp={ctrl.mirrorWarp} />
 
-        {/* 下から湧き上がる「〜ない」の文字粒 */}
+        {/* 下から湧き上がる「〜ない」の文字粒（→緩急で棒人間に集合） */}
         <WordParticles
           atlas={atlas}
           count={ctrl.wordCount}
@@ -60,6 +69,8 @@ export default function App() {
           globalSpin={ctrl.globalSpin}
           colorBottom={ctrl.colorBottom}
           colorTop={ctrl.colorTop}
+          formFigure={ctrl.formFigure}
+          cycleSeconds={ctrl.cycleSeconds}
         />
 
         {/* 足元に溜まっていく堆積層 */}

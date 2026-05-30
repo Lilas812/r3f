@@ -1,0 +1,16 @@
+/* 画面いっぱいに3Dを広げる。背景は黒（録画時に合成しやすい単色）。 */
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+  background: #06070b;
+}
+
+canvas {
+  display: block;
+}
+
+* {
+  box-sizing: border-box;
+}

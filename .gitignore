@@ -1,0 +1,12 @@
+# 依存パッケージ・ビルド成果物（各作品フォルダ内）
+node_modules/
+dist/
+dist-ssr/
+
+# ログ・OS・エディタ
+*.log
+npm-debug.log*
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/
